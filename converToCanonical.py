@@ -1,7 +1,11 @@
 '''
 Created by suhas on 3/31/2017.
 Program to convert equations to Canonical form
+Limitations:
+1. Cannot not handle * and / operations within brackets. Eg: x + x( 10 +  5x/4 ),
+2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )
 '''
+
 import re,sys
 from collections import defaultdict
 
