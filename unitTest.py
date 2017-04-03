@@ -7,7 +7,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(converToCanonical.inputMode("x +( = 0"), 'ERROR: Input has incorrect number of nested brackets\n')
         self.assertEqual(converToCanonical.inputMode("x ++( = 0"), 'Incorrect Input\n')
         self.assertEqual(converToCanonical.inputMode("x +()) = 0"), 'ERROR: Input has incorrect number of nested brackets\n')
-        self.assertEqual(converToCanonical.inputMode("x +(() = 0"), 'ERROR: Input missing sign before brackets\n')
+        self.assertEqual(converToCanonical.inputMode("x +(() = 0"), 'ERROR: Input has incorrect number of nested brackets\n')
         self.assertEqual(converToCanonical.inputMode("x +( x * y ) = 0"), 'Incorrect Input\n')    
 
     def test_inputMode_Calculate(self):        

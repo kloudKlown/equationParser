@@ -2,9 +2,9 @@
 Created by suhas on 3/31/2017.
 Program to convert equations to Canonical form
 Limitations:
-1. Cannot not handle * and / operations within brackets. Eg: x + x( 10 +  5x/4 ),
-2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )	
-
+1. Cannot not handle * and / operations within brackets. Eg: x + x( 10 +  5x/4 ). Also should contain '='
+2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )
+3. Cannot handle '+-','--' .. etc.,
 '''
 
 import re,sys
@@ -17,7 +17,6 @@ outputFile = open('solved_equations.txt','w+')
 def readFromCMD():
 	cmdInput = raw_input("Enter Equation: ")
 	print"Canonical Form: ", inputMode(cmdInput)
-
 
 def readFromFile():
 	for each in inputFile:
@@ -44,7 +43,7 @@ def inputMode(each):
 	### Break the equation at braces, +, - signs. 
 	for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip())):			
 		### 'a^k' is equal to `1a^k` so append `1` to the string. This makes the format uniform for further calculations
-		if re.match(r'(^[a-z])',eachSplit):
+		if re.match(r'(^[a-zA-Z])',eachSplit):
 			eq_Queue.append( ('1' + eachSplit) )
 			continue
 		if eachSplit:
@@ -66,7 +65,6 @@ def convertToCanonical(equation):
 	### If braces were in the equation it is now of the form -- x + x( a + x ) = x + x*a + x*x
 	for i in range(0,len(equation)):
 		flag = False
-	
 		if equation[i] == '':
 			continue
 
@@ -237,7 +235,7 @@ def main():
 		elif C == 2:
 			readFromCMD()
 		else:
-			break
+			exit()
 		
 
 if __name__ == "__main__":
