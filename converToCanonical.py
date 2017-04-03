@@ -6,13 +6,11 @@ Limitations:
 2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )
 3. Cannot handle '+-','--' .. etc.,
 '''
-
 import re,sys
 from collections import defaultdict
 
 inputFile = open('equations.txt','r')
 outputFile = open('solved_equations.txt','w+')
-
 
 def readFromCMD():
 	cmdInput = raw_input("Enter Equation: ")
@@ -229,7 +227,7 @@ def sortEquation(eq_Dict):
 
 def main():
 	while 1:
-		C = input("Enter 1 for input, 2 read from CMD, 3 for exit")
+		C = input("Enter 1 for input from 'equtions.txt' file, 2 read from CMD, 3 for exit")
 		if C == 1:
 			readFromFile()			
 		elif C == 2:
