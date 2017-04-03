@@ -3,12 +3,12 @@ import converToCanonical
 class TestStringMethods(unittest.TestCase):
 
     def test_inputMode_InCorrectInputs(self):
-        self.assertEqual(converToCanonical.inputMode("x"), 'In Correct Input\n')
+        self.assertEqual(converToCanonical.inputMode("x"), 'Incorrect Input\n')
         self.assertEqual(converToCanonical.inputMode("x +( = 0"), 'ERROR: Input has incorrect number of nested brackets\n')
-        self.assertEqual(converToCanonical.inputMode("x ++( = 0"), 'In Correct Input. *, / , %, ++, -- not supported\n')
+        self.assertEqual(converToCanonical.inputMode("x ++( = 0"), 'Incorrect Input\n')
         self.assertEqual(converToCanonical.inputMode("x +()) = 0"), 'ERROR: Input has incorrect number of nested brackets\n')
         self.assertEqual(converToCanonical.inputMode("x +(() = 0"), 'ERROR: Input missing sign before brackets\n')
-        self.assertEqual(converToCanonical.inputMode("x +( x * y ) = 0"), 'In Correct Input. *, / , %, ++, -- not supported\n')    
+        self.assertEqual(converToCanonical.inputMode("x +( x * y ) = 0"), 'Incorrect Input\n')    
 
     def test_inputMode_Calculate(self):        
         self.assertEqual(converToCanonical.inputMode("x=1"), 'x - 1.0 = 0.0\n')

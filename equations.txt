@@ -1,12 +1,14 @@
 x
-x (-(+(-3))) = x 
-x = 1
-x = x( x + 1 )
-x = x( x + abc  + cba + bca )
-x = x( x + abc  - 10x ( cba - bca ) )
-x = x( x + abc  - 10x ( cba^2 + bcax ) )
-x = x( x + abc  - 10x ( cba^2 + bcax + x(abc) ) + 20xxabc ) 
-x = x( x + abc  - 10x ( xcba^2 + bcax + x(abc) ) + 10xxaabc ) 
-x + x( x + abc  - 10x ( xcba^2 + bcax + x(abc) ) + 10xxaabc ) - 20x^3abc = 0
-x + x( x + abc  - 10x ( xcba^2 + bcax + x(abc) ) + 10xxaabc ) + 20abcx^3 = 0
-x + x( x + abc  - 10x ( xcba^2 + bcax + x(abc) ) + 10xxaabc ) + 20abcx^3 = x + x( x + abc  - 10x ( xcba^2 + bcax + x(abc) ) + 10xxaabc ) + 20abcx^3
+x ( x + abc  - 10x ( cba^2 + bcax + x(abc) ) + 20xxabc ) = 0
+-x (-(+(-3))) = x
+x + xxx( 1 ) = 0 
+x + xxx( abc + bca + cab ) = 0 
+x + xxx( abc + bca - cab ) = 0 
+x + xxx( abc + bca - cabx^5 ) = 0 
+x + xxx( abc + x^5( bca ) - cabx^5 ) = 0 
+x + xxx( abc + x^5( bca ) - cabx^5 ) = x + xxx( abc + x^5( bca ) - cabx^5 )
+x + xxx( abc + 2x^5( bca ) - cabx^5 ) = 0 
+x + xxx( abc + 2x^5( bca ) - cabx^5.5 ) = 0 
+x + xxx( abc + 2x^5( bca +  y (2) ) - cabx^5.5 ) = 0 
+xxx( abc + 2x^5( bca +  y (2) ) - cabx^5.5 ) = 0 
+0 = x + xxx( abc + 2x^5( bca +  y (2) ) - cabx^5.5 )

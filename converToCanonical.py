@@ -1,42 +1,35 @@
 '''
 Created by suhas on 3/31/2017.
 Program to convert equations to Canonical form
-
-
-
 '''
 import re,sys
 from collections import defaultdict
 
 inputFile = open('equations.txt','r')
-outputFile = open('solved_equations2.txt','ab+')
+outputFile = open('solved_equations.txt','ab+')
 
 def readFromFile():
 	for each in inputFile:
 
 		outputFile.write(each)
 		out = inputMode(each)
-		outputFile.write('----- Answer -----')
-		outputFile.write(out)
-		outputFile.write('------------------')
+		outputFile.write('Canonical Form: '+out)
+		outputFile.write('------------------\n')
 	inputFile.close()
 	outputFile.close()
 
 def inputMode(each):
 	eq_Queue=[]
-	if each.count('=') != 1:	
-		return 'In Correct Input\n'
-	
+
 	if each.count('*') or each.count('/') or each.count('%') or each.count('-+') or \
-	each.count('+-') > 0 or each.count('++') > 0 or each.count('--') > 0 :
-		return 'In Correct Input. *, / , %, ++, -- not supported\n'			 
+	each.count('+-') > 0 or each.count('++') > 0 or each.count('--') > 0 or each.count('=') != 1 :
+		return 'Incorrect Input\n'			 
 	
 	### '=' is equal to `- (`  pair so append `-(` instead of '='
 	each = each.replace('=','-(')
 	
 	### Break the equation at braces, +, - signs. 
-	for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip()))   :			
-
+	for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip())):			
 		### 'a^k' is equal to `1a^k` so append `1` to the string. This makes the format uniform for further calculations
 		if re.match(r'(^[a-z])',eachSplit):
 			eq_Queue.append( ('1' + eachSplit) )
@@ -47,6 +40,42 @@ def inputMode(each):
 	return (convertToCanonical(eq_Queue).replace('  ',' '))
 	del eq_Queue
 	eq_Queue=[]	
+
+def convertToCanonical(equation):
+	''' Remove braces first before evaluating the equation
+	'''
+	equation = filter(None,removeBraces(equation))
+	eq_Dict=defaultdict(int)
+	if equation[0:5] == 'ERROR':
+		return equation
+
+	### Braces are removed. Add/subtract terms in the equation appropirately. 
+	### If braces were in the equation it is now of the form -- x + x( a + x ) = x + x*a + x*x
+	for i in range(0,len(equation)):
+		flag = False
+	
+		if equation[i] == '':
+			continue
+
+		### convert any term with '*' correct format. ie., ax^k. Eg: 20.1x * 10x^2 * abcxx * 2 = 400.1 abcx^5.0 
+		if len(re.split('(\*+)',equation[i]) ) > 1:
+			equation[i] = calculateMultiplicationCoefficients(equation[i])
+			flag= True
+
+		### Using Dictionary object for adding/subtracting terms. Eg: in '400.1 abcx^5.0 ' {'abcx^5.0' : 400.1}
+		### any term which has key 'abcx^5.0' will increment/decerement the value
+		if len(re.split('(^\d+\.*\d*)',equation[i])) > 2:		
+			if flag == False:
+				equation[i] = calculateMultiplicationCoefficients('1*'+equation[i])
+			
+			temp = re.split('(^\d+\.*\d*)',equation[i])[1:]
+			if equation[i-1] == "-":
+				temp[0] = float(temp[0]) * - 1
+
+			temp[1] = reorderEquation(temp[1])
+			eq_Dict[temp[1]] += float(temp[0])
+
+	return sortEquation(eq_Dict)
 
 def removeBraces(equation):
 	''' Use simple stacks as always to simplify the braces and signs. Calling it a stack as I do append and pop operations.
@@ -60,9 +89,7 @@ def removeBraces(equation):
 	For the above equation the multiplicationFactor is [ '1*', '1*2x' , '1*2x*xy' ]. Using push pop to multiply the appropraiate terms.
 	'''
 	multiplicationFactor = ['1*']
-
 	for i in range(1,len(equation)):
-
 		if equation[i].find('(') != -1:
 			### when opening braches push to stack
 			if equation[i-1] != '-' and equation[i-1] != '+':
@@ -117,48 +144,6 @@ def removeBraces(equation):
 		return 'ERROR: Input has incorrect number of nested brackets\n'
 	return equation
 
-def reorderEquation(equation):
-	''' Reordering the equation to a^k1b^k2...z^kN'''
-	equation = filter(None,re.split('(\w\^\d+\.\d+)',equation))
-	equation.sort()
-	equation = ''.join(equation)	
-	return equation
-
-
-def convertToCanonical(equation):
-	''' Remove braces first before evaluating the equation
-	'''
-	equation = filter(None,removeBraces(equation))
-	eq_Dict=defaultdict(int)
-	if equation[0:5] == 'ERROR':
-		return equation
-
-	### Braces are removed. Add/subtract terms in the equation appropirately. 
-	### If braces were in the equation it is now of the form -- x + x( a + x ) = x + x*a + x*x
-	for i in range(0,len(equation)):
-		flag = False
-	
-		if equation[i] == '':
-			continue
-
-		##### convert any term with '*' correct format. ie., ax^k. Eg: 20.1x * 10x^2 * abcxx * 2 = 400.1 abcx^5.0 
-		if len(re.split('(\*+)',equation[i]) ) > 1:
-			equation[i] = calculateMultiplicationCoefficients(equation[i])
-			flag= True
-
-		if len(re.split('(^\d+\.*\d*)',equation[i])) > 2:		
-			if flag == False:
-				equation[i] = calculateMultiplicationCoefficients('1*'+equation[i])
-			
-			temp = re.split('(^\d+\.*\d*)',equation[i])[1:]
-			if equation[i-1] == "-":
-				temp[0] = float(temp[0]) * - 1
-
-			temp[1] = reorderEquation(temp[1])
-			eq_Dict[temp[1]] += float(temp[0])
-
-	return sortEquation(eq_Dict)
-
 def calculateMultiplicationCoefficients(subEquation):
 	temEq = re.split('\*',subEquation)
 	newV = 1
@@ -185,7 +170,6 @@ def calculateMultiplicationCoefficients(subEquation):
 					while i < len(temp[1]) and not temp[1][i].isalpha():	
 						power += temp[1][i]
 						i += 1
-
 					tempDict[charStack.pop()] += float(power)
 			
 			if len(charStack) > 0 :
@@ -199,6 +183,14 @@ def calculateMultiplicationCoefficients(subEquation):
 			subEquation += key
 	return str(newV) + (reorderEquation(subEquation))
 
+def reorderEquation(equation):
+	''' Reordering the equation to a^k1b^k2...z^kN'''
+	equation = filter(None,re.split('(\w\^\d+\.\d+)',equation))
+	equation.sort()
+	equation = ''.join(equation)	
+	return equation
+
+
 def sortEquation(eq_Dict):
 
 	allKeys = [key for key in eq_Dict.keys()]
@@ -208,7 +200,7 @@ def sortEquation(eq_Dict):
 		del allKeys[0]
 	finalSolved_Equation = ""	
 
-	### Output Formatting
+	### Formatting for clean looking output
 	for key in allKeys:
 		if eq_Dict[key] == 1.0:
 			eq_Dict[key] = ''
