@@ -1,45 +1,52 @@
+'''
+Created by suhas on 3/31/2017.
+Program to convert equations to Canonical form
+
+
+
+'''
 import re,sys
 from collections import defaultdict
 
 inputFile = open('equations.txt','r')
-outputFile = open('solved_equations.txt','ab+')
+outputFile = open('solved_equations2.txt','ab+')
 
 def readFromFile():
-	eq_Queue=[]
-
 	for each in inputFile:
-		outputFile.write(each)
-		
-		if each.count('=') != 1:
-			outputFile.write('In Correct Input')
-			continue
-		
-		if each.count('*') or each.count('/') or each.count('%') or each.count('-+') or \
-		each.count('+-') > 0 or each.count('++') > 0 or each.count('--') > 0 :
-			outputFile.write('In Correct Input. *, / , % not supported')
-			continue			
-		
-		### '=' is equal to `- (`  pair so append `-(` instead of '='
-		each = each.replace('=','-(')
-		
-		### Break the equation at braces, +, - signs. 
-		for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip()))   :			
 
-			### 'a^k' is equal to `1a^k` so append `1` to the string. This makes the format uniform for further calculations
-			if re.match(r'(^[a-z])',eachSplit):
-				eq_Queue.append( ('1' + eachSplit) )
-				continue
-			if eachSplit:
-				eq_Queue.append(eachSplit)
-		eq_Queue.append(')')
-		print "-------------------------------------"
-		print "-------------------------------------"
-		print convertToCanonical(eq_Queue)
-		outputFile.write(convertToCanonical(eq_Queue))
-		del eq_Queue
-		eq_Queue=[]
+		outputFile.write(each)
+		out = inputMode(each)
+		outputFile.write('----- Answer -----')
+		outputFile.write(out)
+		outputFile.write('------------------')
 	inputFile.close()
 	outputFile.close()
+
+def inputMode(each):
+	eq_Queue=[]
+	if each.count('=') != 1:	
+		return 'In Correct Input\n'
+	
+	if each.count('*') or each.count('/') or each.count('%') or each.count('-+') or \
+	each.count('+-') > 0 or each.count('++') > 0 or each.count('--') > 0 :
+		return 'In Correct Input. *, / , %, ++, -- not supported\n'			 
+	
+	### '=' is equal to `- (`  pair so append `-(` instead of '='
+	each = each.replace('=','-(')
+	
+	### Break the equation at braces, +, - signs. 
+	for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip()))   :			
+
+		### 'a^k' is equal to `1a^k` so append `1` to the string. This makes the format uniform for further calculations
+		if re.match(r'(^[a-z])',eachSplit):
+			eq_Queue.append( ('1' + eachSplit) )
+			continue
+		if eachSplit:
+			eq_Queue.append(eachSplit)
+	eq_Queue.append(')')
+	return (convertToCanonical(eq_Queue).replace('  ',' '))
+	del eq_Queue
+	eq_Queue=[]	
 
 def removeBraces(equation):
 	''' Use simple stacks as always to simplify the braces and signs. Calling it a stack as I do append and pop operations.
@@ -53,6 +60,7 @@ def removeBraces(equation):
 	For the above equation the multiplicationFactor is [ '1*', '1*2x' , '1*2x*xy' ]. Using push pop to multiply the appropraiate terms.
 	'''
 	multiplicationFactor = ['1*']
+
 	for i in range(1,len(equation)):
 
 		if equation[i].find('(') != -1:
@@ -60,28 +68,34 @@ def removeBraces(equation):
 			if equation[i-1] != '-' and equation[i-1] != '+':
 				### If eq is  x - 2(  a + b ), add 2 to the mulitiplicationFactor Stack.
 				multiplicationFactor.append( equation[i-1] )
-				plus_Minus.append(equation[i-2])
+				if i-2 < 0:
+					plus_Minus.append('+')
+				else:
+					plus_Minus.append(equation[i-2])
 			else:
 				### If eq is  x - (  a + b ), it is still equivalent to x -  1*( a + b )
-				multiplicationFactor.append( multiplicationFactor[-1] + '1' )
+				multiplicationFactor.append( multiplicationFactor[-1] + '1*' )
 				plus_Minus.append(equation[i-1])
 			if len(plus_Minus[-1]) != 1:
-				return 'ERROR: Input missing sign before brackets'			
+				return 'ERROR: Input missing sign before brackets\n'	
+
+			### Remove previous sign to avoid confusion i.e.,  x - (- a ) --> x - +a			
 			braces_C += 1
 			equation[i]=''
 			equation[i-1]=''	
 			continue
 
 		if equation[i].find(')') != -1:
-			if len(plus_Minus) < 0:
-				return 'ERROR: Input has incorrect number of nested brackets'			
+			if len(plus_Minus) == 0:
+				return 'ERROR: Input has incorrect number of nested brackets\n'			
 			braces_C -= 1
 			equation[i]=''
 			plus_Minus.pop()
 			multiplicationFactor.pop()
 			continue
 
-		if braces_C > 0:			
+		if braces_C > 0:	
+
 			if equation[i] == '+' or equation[i] == '-':
 				if ord(plus_Minus[-1]) ^ ord(equation[i]) == 0:
 					equation[i] = '+'
@@ -93,17 +107,18 @@ def removeBraces(equation):
 					equation[i-1] = '+'
 				else:
 					equation[i-1] = '-'
+				
 			### apply appropriate muliplication factor based on the nesting of braces
 			if len(multiplicationFactor) > 1:
 				equation[i] = multiplicationFactor[-1] + '*'+ equation[i] 
 
 	equation.insert(0,'+')
 	if braces_C != 0:
-		return 'ERROR: Input has incorrect number of nested brackets'
-
+		return 'ERROR: Input has incorrect number of nested brackets\n'
 	return equation
 
 def reorderEquation(equation):
+	''' Reordering the equation to a^k1b^k2...z^kN'''
 	equation = filter(None,re.split('(\w\^\d+\.\d+)',equation))
 	equation.sort()
 	equation = ''.join(equation)	
@@ -183,8 +198,6 @@ def calculateMultiplicationCoefficients(subEquation):
 		else:
 			subEquation += key
 	return str(newV) + (reorderEquation(subEquation))
-
-
 
 def sortEquation(eq_Dict):
 
