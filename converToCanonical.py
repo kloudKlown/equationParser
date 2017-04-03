@@ -3,14 +3,21 @@ Created by suhas on 3/31/2017.
 Program to convert equations to Canonical form
 Limitations:
 1. Cannot not handle * and / operations within brackets. Eg: x + x( 10 +  5x/4 ),
-2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )
+2. Cannot not handle multiplications of the form  ( a + b ) * ( c + d )	
+
 '''
 
 import re,sys
 from collections import defaultdict
 
 inputFile = open('equations.txt','r')
-outputFile = open('solved_equations.txt','ab+')
+outputFile = open('solved_equations.txt','w+')
+
+
+def readFromCMD():
+	cmdInput = raw_input("Enter Equation: ")
+	print"Canonical Form: ", inputMode(cmdInput)
+
 
 def readFromFile():
 	for each in inputFile:
@@ -19,6 +26,7 @@ def readFromFile():
 		out = inputMode(each)
 		outputFile.write('Canonical Form: '+out)
 		outputFile.write('------------------\n')
+
 	inputFile.close()
 	outputFile.close()
 
@@ -32,6 +40,7 @@ def inputMode(each):
 	### '=' is equal to `- (`  pair so append `-(` instead of '='
 	each = each.replace('=','-(')
 	
+	each = each.replace('((','(+(')
 	### Break the equation at braces, +, - signs. 
 	for eachSplit in  filter(None,re.split('(-)|(\+)|(\()|(\))',(each.replace(' ','')).strip())):			
 		### 'a^k' is equal to `1a^k` so append `1` to the string. This makes the format uniform for further calculations
@@ -222,10 +231,14 @@ def sortEquation(eq_Dict):
 
 def main():
 	while 1:
-		C = input("Enter 1 for input, 2 for exit")
-		if C != 1:
+		C = input("Enter 1 for input, 2 read from CMD, 3 for exit")
+		if C == 1:
+			readFromFile()			
+		elif C == 2:
+			readFromCMD()
+		else:
 			break
-		readFromFile()			
+		
 
 if __name__ == "__main__":
 	main()
